@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Binayah Properties - Fetched Articles Preview</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+      :root {
+          --bg-deep: #063b33;
+          --bg-mid: #0b4f44;
+          --bg-soft: #eef6f3;
+          --surface: #ffffff;
+          --text-strong: #102320;
+          --text-muted: #4c625d;
+          --brand-primary: #0f5e50;
+          --brand-primary-soft: #d8ece6;
+          --brand-accent: #d7b05a;
+          --brand-accent-deep: #b1882f;
+          --line: #d9e4e0;
+          --danger: #e5484d;
+          --shadow-soft: 0 10px 24px rgba(8, 34, 30, 0.12);
+          --shadow-strong: 0 18px 42px rgba(4, 28, 25, 0.18);
+      }
+
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      html,
+      body {
+          min-height: 100%;
+      }
+
+      body {
+          font-family: 'Manrope', 'Segoe UI', Tahoma, sans-serif;
+          color: var(--text-strong);
+          background:
+              radial-gradient(circle at 15% 10%, rgba(215, 176, 90, 0.25), transparent 40%),
+              radial-gradient(circle at 85% 18%, rgba(191, 230, 219, 0.2), transparent 35%),
+              linear-gradient(165deg, var(--bg-deep) 0%, var(--bg-mid) 34%, #0f6b5a 100%);
+          padding: 22px;
+      }
+
+      .container {
+          max-width: 1240px;
+          margin: 0 auto;
+      }
+
+      .hero {
+          background: linear-gradient(145deg, #ffffff 0%, #f5faf8 100%);
+          border-radius: 22px;
+          margin-bottom: 24px;
+          padding: 28px 30px;
+          box-shadow: var(--shadow-strong);
+          border: 1px solid rgba(255, 255, 255, 0.6);
+          position: relative;
+          overflow: hidden;
+      }
+
+      .hero::after {
+          content: '';
+          position: absolute;
+          top: -80px;
+          right: -60px;
+          width: 220px;
+          height: 220px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(215, 176, 90, 0.2) 0%, rgba(215, 176, 90, 0) 72%);
+          pointer-events: none;
+      }
+
+      .hero h1 {
+          font-family: 'Fraunces', Georgia, serif;
+          font-size: clamp(2rem, 3.2vw, 2.9rem);
+          letter-spacing: 0.2px;
+          color: #0d4d42;
+          margin-bottom: 8px;
+          line-height: 1.1;
+      }
+
+      .subtitle {
+          color: var(--text-muted);
+          font-size: 1rem;
+          line-height: 1.45;
+      }
+
+      .hero-meta {
+          margin-top: 16px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+      }
+
+      .meta-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #fff;
+          border: 1px solid var(--line);
+          color: #254741;
+          font-size: 0.84rem;
+          font-weight: 700;
+          border-radius: 999px;
+          padding: 8px 12px;
+      }
+
+      .meta-chip.muted {
+          color: #60756f;
+          font-weight: 600;
+      }
+
+      .meta-chip.window {
+          background: var(--brand-primary-soft);
+          border-color: #b8dad0;
+          color: #0f4f44;
+      }
+
+      .stats {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 14px;
+          margin-bottom: 22px;
+      }
+
+      .stat-card {
+          background: var(--surface);
+          border-radius: 16px;
+          box-shadow: var(--shadow-soft);
+          border: 1px solid #edf3f1;
+          padding: 16px 18px;
+          position: relative;
+          overflow: hidden;
+      }
+
+      .stat-card::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 3px;
+          background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
+      }
+
+      .stat-number {
+          color: var(--brand-primary);
+          font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+          font-weight: 800;
+          line-height: 1.1;
+          margin-bottom: 4px;
+      }
+
+      .stat-label {
+          color: #5f726d;
+          font-size: 0.78rem;
+          text-transform: uppercase;
+          letter-spacing: 1.1px;
+          font-weight: 700;
+      }
+
+      .source-breakdown {
+          background: var(--surface);
+          border-radius: 16px;
+          padding: 18px 20px;
+          margin-bottom: 18px;
+          box-shadow: var(--shadow-soft);
+          border: 1px solid #edf3f1;
+      }
+
+      .source-breakdown h3 {
+          color: var(--brand-primary);
+          margin-bottom: 14px;
+          font-size: 0.95rem;
+          text-transform: uppercase;
+          letter-spacing: 1.2px;
+      }
+
+      .source-bars {
+          display: flex;
+          flex-direction: column;
+          gap: 9px;
+      }
+
+      .source-bar-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+      }
+
+      .source-bar-label {
+          width: 220px;
+          font-size: 0.84rem;
+          color: #30443f;
+          font-weight: 700;
+          text-align: right;
+          flex-shrink: 0;
+      }
+
+      .source-bar-track {
+          flex: 1;
+          height: 22px;
+          background: #edf3f1;
+          border-radius: 999px;
+          overflow: hidden;
+          border: 1px solid #deebe6;
+      }
+
+      .source-bar-fill {
+          height: 100%;
+          border-radius: 999px;
+          display: flex;
+          align-items: center;
+          padding-left: 10px;
+          font-size: 0.74rem;
+          font-weight: 800;
+          color: #fff;
+          min-width: 30px;
+          transition: width 0.55s ease;
+      }
+
+      .source-bar-fill.tier-newsapi {
+          background: linear-gradient(90deg, #0f5e50, #1d7a68);
+      }
+
+      .source-bar-fill.tier-newsdata {
+          background: linear-gradient(90deg, #cda146, #e0be71);
+          color: #24403b;
+      }
+
+      .source-bar-fill.tier-currents {
+          background: linear-gradient(90deg, #607d8b, #8ea1ab);
+      }
+
+      .source-bar-fill.tier-none {
+          background: linear-gradient(90deg, #c43d42, #e45d62);
+      }
+
+      .source-bar-count {
+          width: 36px;
+          font-size: 0.84rem;
+          font-weight: 800;
+          color: #264741;
+          text-align: left;
+          flex-shrink: 0;
+      }
+
+      .controls {
+          position: sticky;
+          top: 12px;
+          z-index: 20;
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          flex-wrap: wrap;
+          margin-bottom: 18px;
+          background: rgba(255, 255, 255, 0.92);
+          backdrop-filter: blur(6px);
+          border-radius: 14px;
+          padding: 12px 14px;
+          box-shadow: var(--shadow-soft);
+          border: 1px solid #e2ece8;
+      }
+
+      .controls-info {
+          color: #4f6560;
+          font-size: 0.86rem;
+          font-weight: 600;
+          margin-right: 4px;
+      }
+
+      .refresh-btn {
+          background: linear-gradient(120deg, var(--brand-accent) 0%, #e7c77a 100%);
+          color: #163730;
+          padding: 11px 18px;
+          border: none;
+          border-radius: 999px;
+          font-size: 0.95rem;
+          font-weight: 800;
+          cursor: pointer;
+          box-shadow: 0 6px 16px rgba(166, 126, 44, 0.32);
+          transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      }
+
+      .refresh-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 10px 20px rgba(141, 106, 34, 0.3);
+          filter: brightness(1.02);
+      }
+
+      .refresh-btn:disabled {
+          opacity: 0.75;
+          cursor: not-allowed;
+          transform: none;
+      }
+
+      .filter-btn {
+          background: #fff;
+          color: var(--brand-primary);
+          padding: 8px 14px;
+          border: 1px solid #bfd8d1;
+          border-radius: 999px;
+          font-size: 0.84rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s ease;
+      }
+
+      .filter-btn:hover,
+      .filter-btn.active {
+          background: var(--brand-primary);
+          color: #fff;
+          border-color: var(--brand-primary);
+      }
+
+      .articles-grid {
+          display: grid;
+          gap: 14px;
+      }
+
+      .article-card {
+          background: #fff;
+          border-radius: 16px;
+          padding: 22px;
+          box-shadow: var(--shadow-soft);
+          border: 1px solid #e7efec;
+          transition: transform 0.22s ease, box-shadow 0.22s ease;
+          animation: riseIn 0.35s ease both;
+      }
+
+      .article-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 16px 30px rgba(7, 35, 31, 0.16);
+      }
+
+      .article-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: start;
+          margin-bottom: 12px;
+          gap: 12px;
+      }
+
+      .article-meta {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+      }
+
+      .badge {
+          padding: 5px 11px;
+          border-radius: 999px;
+          font-size: 0.78rem;
+          font-weight: 800;
+          letter-spacing: 0.2px;
+      }
+
+      .badge-source {
+          background: #0f5e50;
+          color: #fff;
+      }
+
+      .badge-api {
+          background: #f4e2b8;
+          color: #5e4410;
+      }
+
+      .badge-num {
+          background: #dff2ea;
+          color: #1e5e4f;
+      }
+
+      .article-title {
+          font-family: 'Fraunces', Georgia, serif;
+          font-size: clamp(1.15rem, 2vw, 1.55rem);
+          color: #123f37;
+          margin: 10px 0 12px;
+          line-height: 1.35;
+      }
+
+      .article-content {
+          color: #485e58;
+          line-height: 1.7;
+          margin: 10px 0;
+          font-size: 0.97rem;
+      }
+
+      .article-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 14px;
+          padding-top: 14px;
+          border-top: 1px solid #e6efec;
+          gap: 10px;
+          flex-wrap: wrap;
+      }
+
+      .article-date {
+          color: #60756f;
+          font-size: 0.86rem;
+          font-weight: 600;
+      }
+
+      .article-link {
+          background: linear-gradient(120deg, #0f5e50, #1d7868);
+          color: #fff;
+          padding: 9px 16px;
+          border-radius: 999px;
+          text-decoration: none;
+          font-size: 0.84rem;
+          font-weight: 800;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          box-shadow: 0 7px 16px rgba(15, 94, 80, 0.26);
+      }
+
+      .article-link:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 10px 20px rgba(15, 94, 80, 0.3);
+      }
+
+      .empty-state {
+          background: rgba(255, 255, 255, 0.95);
+          color: #415651;
+          padding: 24px;
+          border-radius: 16px;
+          margin: 18px 0;
+          border: 1px dashed #b9d2cb;
+          text-align: center;
+          box-shadow: var(--shadow-soft);
+      }
+
+      .empty-state h3 {
+          margin-bottom: 6px;
+          font-size: 1.1rem;
+          color: #234942;
+      }
+
+      @keyframes riseIn {
+          from {
+              opacity: 0;
+              transform: translateY(8px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+
+      @media (max-width: 860px) {
+          body {
+              padding: 14px;
+          }
+
+          .hero {
+              padding: 20px 18px;
+              border-radius: 16px;
+          }
+
+          .source-bar-label {
+              width: 130px;
+              font-size: 0.74rem;
+          }
+
+          .controls {
+              position: static;
+              padding: 12px;
+          }
+
+          .controls-info {
+              width: 100%;
+              order: 10;
+          }
+
+          .article-card {
+              padding: 18px;
+          }
+      }
+
+      @media (max-width: 560px) {
+          .source-bar-row {
+              gap: 8px;
+          }
+
+          .source-bar-count {
+              width: 28px;
+          }
+
+          .article-link {
+              width: 100%;
+              text-align: center;
+          }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="hero">
+        <h1>Binayah Articles Review Board</h1>
+        <p class="subtitle">
+          Track fetched stories, review source activity, and open full articles
+          from one place.
+        </p>
+
+        <div class="hero-meta">
+          <span class="meta-chip"
+            >Date Range: {{ date_from }} to {{ date_to }} ({{ lookback_days }}
+            days)</span
+          >
+          {% if fetch_window_start and fetch_window_end %}
+          <span class="meta-chip window"
+            >Fetch window: {{ fetch_window_start }} to {{ fetch_window_end
+            }}</span
+          >
+          {% endif %}
+          <span class="meta-chip muted">Generated: {{ timestamp }}</span>
+        </div>
+      </header>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number">{{ total_articles }}</div>
+          <div class="stat-label">Total Articles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">
+            {{ sources_with_results }}/{{ total_sources }}
+          </div>
+          <div class="stat-label">Sources Hit</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ api_count }}</div>
+          <div class="stat-label">APIs Used</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ lookback_days }}</div>
+          <div class="stat-label">Days Window</div>
+        </div>
+      </div>
+
+      <div class="source-breakdown">
+        <h3>Articles Per Source</h3>
+        <div class="source-bars">
+          {% for src in source_stats %}
+          <div class="source-bar-row">
+            <span class="source-bar-label">{{ src.name }}</span>
+            <div class="source-bar-track">
+              {% if src.count > 0 %}
+              <div
+                class="source-bar-fill tier-{{ src.tier_class }}"
+                style="width: {{ src.bar_pct }}%;"
+              >
+                {{ src.tier }}
+              </div>
+              {% else %}
+              <div class="source-bar-fill tier-none" style="width: 8%;">
+                None
+              </div>
+              {% endif %}
+            </div>
+            <span class="source-bar-count">{{ src.count }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="controls">
+        <form
+          method="post"
+          onsubmit="setFetchLoading(this)"
+          style="display:inline;"
+        >
+          <button class="refresh-btn" type="submit">Fetch New Articles</button>
+        </form>
+        <button class="filter-btn active" onclick="filterArticles('all', this)">
+          All
+        </button>
+        {% for src_name in source_names %}
+        <button
+          class="filter-btn"
+          onclick="filterArticles('{{ src_name }}', this)"
+        >
+          {{ src_name }}
+        </button>
+        {% endfor %}
+      </div>
+
+      <div class="articles-grid" id="articles-grid">
+        {% for article in articles %}
+        <div class="article-card" data-source="{{ article.source }}">
+          <div class="article-header">
+            <div class="article-meta">
+              <span class="badge badge-num">#{{ loop.index }}</span>
+              <span class="badge badge-source">{{ article.source }}</span>
+              <span class="badge badge-api">{{ article.api_tier }}</span>
+            </div>
+          </div>
+
+          <h2 class="article-title">{{ article.title }}</h2>
+
+          <div class="article-content">
+            {{ article.content[:400] }}{% if article.content|length > 400
+            %}...{% endif %}
+          </div>
+
+          <div class="article-footer">
+            <span class="article-date">
+              Published: {{ article.release_time }}
+            </span>
+            <a
+              href="{{ article.url }}"
+              target="_blank"
+              class="article-link"
+              rel="noopener noreferrer"
+            >
+              Open Full Article
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if not articles %}
+      <div class="empty-state">
+        {% if has_fetch_history %}
+        <h3>No new articles yet</h3>
+        <p>
+          The latest fetch completed and no fresh articles were found in the
+          current source windows.
+        </p>
+        {% else %}
+        <h3>No articles in database yet</h3>
+        <p>
+          Use <strong>Fetch New Articles</strong> to pull recent stories and
+          store them in MongoDB.
+        </p>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <script>
+      function setFetchLoading(form) {
+          const btn = form.querySelector('.refresh-btn');
+          if (!btn) return true;
+          btn.disabled = true;
+          btn.textContent = 'Fetching...';
+          return true;
+      }
+
+      function filterArticles(source, btn) {
+          document.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          document.querySelectorAll('.article-card').forEach((card) => {
+              if (source === 'all' || card.dataset.source === source) {
+                  card.style.display = '';
+              } else {
+                  card.style.display = 'none';
+              }
+          });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY . /src
+
+RUN set -eux; \
+  if [ -f /src/requirements.txt ]; then \
+    pip install --no-cache-dir -r /src/requirements.txt; \
+  elif [ -f /src/apps/api/requirements.txt ]; then \
+    pip install --no-cache-dir -r /src/apps/api/requirements.txt; \
+  else \
+    echo "❌ requirements.txt not found"; exit 1; \
+  fi
+
+ENV PYTHONPATH=/src/apps/api:/src
+
+CMD ["celery", "-A", "app.worker.celery_app", "worker", "-l", "info", "--concurrency=2"]

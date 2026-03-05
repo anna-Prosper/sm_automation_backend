@@ -1,0 +1,161 @@
+version: "3.9"
+services:
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+      target: api
+    container_name: binayah-api
+    env_file:
+      - .env.prod
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "false"
+      MONGODB_URI: ${MONGODB_URI}
+      MONGODB_DB_NAME: ${MONGODB_DB_NAME:-binayah_news}
+      REDIS_URL: redis://redis:6379/0
+      STORAGE_BACKEND: s3
+      STORAGE_KEEP_LOCAL: "false"
+      STORAGE_LOCAL_PATH: /app/storage
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-sm-automation-5464}
+      AWS_S3_REGION: ${AWS_S3_REGION:-ap-south-1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      STABILITY_API_KEY: ${STABILITY_API_KEY:-}
+      NEWSAPI_KEY: ${NEWSAPI_KEY:-}
+      BRAND_PRIMARY_COLOR: ${BRAND_PRIMARY_COLOR:-#004e41}
+      BRAND_SECONDARY_COLOR: ${BRAND_SECONDARY_COLOR:-#d1ae4a}
+      BRAND_NAME: ${BRAND_NAME:-Binayah Properties}
+    expose:
+      - "8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  worker:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+      target: worker
+    container_name: binayah-worker
+    env_file:
+      - .env.prod
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "false"
+      MONGODB_URI: ${MONGODB_URI}
+      MONGODB_DB_NAME: ${MONGODB_DB_NAME:-binayah_news}
+      REDIS_URL: redis://redis:6379/0
+      STORAGE_BACKEND: s3
+      STORAGE_KEEP_LOCAL: "false"
+      STORAGE_LOCAL_PATH: /app/storage
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-sm-automation-5464}
+      AWS_S3_REGION: ${AWS_S3_REGION:-ap-south-1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      STABILITY_API_KEY: ${STABILITY_API_KEY:-}
+      NEWSAPI_KEY: ${NEWSAPI_KEY:-}
+      BRAND_PRIMARY_COLOR: ${BRAND_PRIMARY_COLOR:-#004e41}
+      BRAND_SECONDARY_COLOR: ${BRAND_SECONDARY_COLOR:-#d1ae4a}
+      BRAND_NAME: ${BRAND_NAME:-Binayah Properties}
+      # Social media credentials — worker executes scheduled publishing tasks
+      META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID:-}
+      WHATSAPP_DEFAULT_RECIPIENTS: ${WHATSAPP_DEFAULT_RECIPIENTS:-[]}
+      FACEBOOK_PAGE_ID: ${FACEBOOK_PAGE_ID:-}
+      FACEBOOK_ACCESS_TOKEN: ${FACEBOOK_ACCESS_TOKEN:-}
+      INSTAGRAM_ACCOUNT_ID: ${INSTAGRAM_ACCOUNT_ID:-}
+      INSTAGRAM_ACCESS_TOKEN: ${INSTAGRAM_ACCESS_TOKEN:-}
+      LINKEDIN_ACCESS_TOKEN: ${LINKEDIN_ACCESS_TOKEN:-}
+      LINKEDIN_PERSON_URN: ${LINKEDIN_PERSON_URN:-}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
+      X_CONSUMER_KEY: ${X_CONSUMER_KEY:-}
+      X_CONSUMER_SECRET: ${X_CONSUMER_SECRET:-}
+      X_ACCESS_TOKEN: ${X_ACCESS_TOKEN:-}
+      X_ACCESS_TOKEN_SECRET: ${X_ACCESS_TOKEN_SECRET:-}
+      X_BEARER_TOKEN: ${X_BEARER_TOKEN:-}
+      NANOBANANA_API_KEY: ${NANOBANANA_API_KEY:-}
+      EVENT_REGISTRY_API_KEY: ${EVENT_REGISTRY_API_KEY:-}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  beat:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+      target: beat
+    container_name: binayah-beat
+    env_file:
+      - .env.prod
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "false"
+      MONGODB_URI: ${MONGODB_URI}
+      MONGODB_DB_NAME: ${MONGODB_DB_NAME:-binayah_news}
+      REDIS_URL: redis://redis:6379/0
+      STORAGE_BACKEND: s3
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-sm-automation-5464}
+      AWS_S3_REGION: ${AWS_S3_REGION:-ap-south-1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      STABILITY_API_KEY: ${STABILITY_API_KEY:-}
+      NEWSAPI_KEY: ${NEWSAPI_KEY:-}
+      BRAND_PRIMARY_COLOR: ${BRAND_PRIMARY_COLOR:-#004e41}
+      BRAND_SECONDARY_COLOR: ${BRAND_SECONDARY_COLOR:-#d1ae4a}
+      BRAND_NAME: ${BRAND_NAME:-Binayah Properties}
+      # Pipeline auto-generation times (24h, Asia/Dubai = GST UTC+4)
+      # Override in .env.prod without touching code
+      PIPELINE_HOUR_1: ${PIPELINE_HOUR_1:-7}    # 07:00 Dubai
+      PIPELINE_HOUR_2: ${PIPELINE_HOUR_2:-13}   # 13:00 Dubai
+      PIPELINE_HOUR_3: ${PIPELINE_HOUR_3:-19}   # 19:00 Dubai
+    volumes:
+      # Persist the beat schedule DB — prevents duplicate task firing on restart
+      - beat_schedule:/app/beat
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: binayah-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: "/api"
+    container_name: binayah-web
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+    driver: local
+  beat_schedule:
+    driver: local
